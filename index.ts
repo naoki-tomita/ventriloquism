@@ -124,8 +124,8 @@ class ElementHandles<T extends Element> {
     this.options = options;
     this.parent = parent;
   }
-  get(index: number): Promise<ElementHandle<T> | undefined> {
-    throw "";
+  async get(index: number): Promise<ElementHandle<T> | undefined> {
+    return wrapElementHandle(await this.parent.$$(this.selector)[index], this.options);
   }
   async shouldHaveCount(count: number): Promise<void> {
     const start = Date.now();
@@ -140,11 +140,14 @@ class ElementHandles<T extends Element> {
     }
     throw error;
   }
-  map<T, U extends Element>(cb: T): Promise<T extends (el: ElementHandle<U>, index: number) => Promise<infer R> ? R : any> {
-    throw "";
+  async map<U>(cb: (handle: ElementHandle<T>) => Promise<U>): Promise<U[]> {
+    return Promise.all((await this.parent.$$(this.selector)).map(cb));
   }
-  forEach<T extends Element>(cb: (el: ElementHandle<T>, index: number) => void): Promise<void> {
-    throw "";
+  async forEach<T extends Element>(cb: (el: ElementHandle<T>, index: number) => void): Promise<void> {
+    const items = await this.parent.$$(this.selector)
+    for (let i = 0; i < items.length; i++) {
+      cb(wrapElementHandle(items[i], this.options), i);
+    }
   }
 }
 
