@@ -6,7 +6,7 @@ Puppeteer wrapper.
 # Examples
 
 ```ts
-import { launch, Text } from "../";
+import { launch, Text } from "ventriloquism";
 
 async function main() {
   const browser = await launch();
